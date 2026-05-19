@@ -1,0 +1,189 @@
+document.addEventListener("DOMContentLoaded", () => {
+    // Theme logic
+    const themeBtns = document.querySelectorAll(".theme-switch button");
+    themeBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const theme = btn.getAttribute("data-set-theme");
+            document.documentElement.setAttribute("data-theme", theme);
+            themeBtns.forEach(b => b.classList.remove("on"));
+            btn.classList.add("on");
+        });
+    });
+
+    // Inputs
+    const isDryBrineToggle = document.getElementById("brine-type-toggle");
+    const isKgToggle = document.getElementById("unit-toggle");
+    const proteinType = document.getElementById("protein-type");
+    const meatWeight = document.getElementById("meat-weight");
+    const saltType = document.getElementById("salt-type");
+    const brineStrength = document.getElementById("brine-strength");
+    const includeSugar = document.getElementById("include-sugar");
+
+    // Outputs
+    const saltVolumeOutput = document.getElementById("salt-volume-output");
+    const saltWeightOutput = document.getElementById("salt-weight-output");
+    const waterSection = document.getElementById("water-section");
+    const waterOutput = document.getElementById("water-output");
+    const sugarSection = document.getElementById("sugar-section");
+    const sugarOutput = document.getElementById("sugar-output");
+    const timeOutput = document.getElementById("time-output");
+    const notesOutput = document.getElementById("notes-output");
+    
+    const calculateBtn = document.getElementById("calculate-btn");
+    const copyBtn = document.getElementById("copy-btn");
+
+    function updateUI() {
+        if (isDryBrineToggle.checked) {
+            waterSection.style.display = "none";
+        } else {
+            waterSection.style.display = "block";
+        }
+        
+        if (includeSugar.checked) {
+            sugarSection.style.display = "block";
+        } else {
+            sugarSection.style.display = "none";
+        }
+    }
+
+    isDryBrineToggle.addEventListener("change", updateUI);
+    includeSugar.addEventListener("change", updateUI);
+
+    function formatTbsp(totalTbsp) {
+        if (totalTbsp >= 16) {
+            const cups = totalTbsp / 16;
+            if (Number.isInteger(cups)) return `${cups} Cup${cups > 1 ? 's' : ''}`;
+            return `${cups.toFixed(2)} Cups`;
+        }
+        
+        if (totalTbsp < 1) {
+            return `${(totalTbsp * 3).toFixed(1)} tsp`;
+        }
+        
+        return `${totalTbsp.toFixed(1)} Tbsp`;
+    }
+
+    function calculate() {
+        const weight = parseFloat(meatWeight.value) || 0;
+        if (weight <= 0) return;
+
+        const isDry = isDryBrineToggle.checked;
+        const isKg = isKgToggle.checked;
+        const protein = proteinType.value;
+        const salt = saltType.value;
+        const strength = brineStrength.value;
+        const hasSugar = includeSugar.checked;
+
+        // Convert weight to grams
+        const weightGrams = isKg ? weight * 1000 : weight * 453.592;
+        const weightLbs = isKg ? weight * 2.20462 : weight;
+
+        let saltGrams = 0;
+        let waterGrams = 0;
+
+        if (isDry) {
+            // Dry Brine Math
+            let ratio = 0.01; // Standard 1%
+            if (strength === 'light') ratio = 0.0075;
+            if (strength === 'strong') ratio = 0.0125;
+            
+            saltGrams = weightGrams * ratio;
+        } else {
+            // Wet Brine Math
+            // Water volume is 50% of meat weight to submerge
+            waterGrams = weightGrams * 0.5;
+            
+            // Equilibrium target in water (5% standard)
+            let wetRatio = 0.05;
+            if (strength === 'light') wetRatio = 0.04;
+            if (strength === 'strong') wetRatio = 0.06;
+            
+            saltGrams = waterGrams * wetRatio;
+        }
+
+        // Salt Density Conversions
+        let gramsPerTbsp = 15; // default
+        if (salt === 'diamond') gramsPerTbsp = 8.44; // 135g/cup
+        else if (salt === 'morton') gramsPerTbsp = 15.6; // 250g/cup
+        else if (salt === 'table') gramsPerTbsp = 18.1; // 290g/cup
+        else if (salt === 'sea') gramsPerTbsp = 15.6; // 250g/cup
+
+        const tbspNeeded = saltGrams / gramsPerTbsp;
+
+        // Render Salt
+        saltVolumeOutput.textContent = formatTbsp(tbspNeeded);
+        saltWeightOutput.textContent = `${saltGrams.toFixed(1)} g`;
+
+        // Render Water
+        if (!isDry) {
+            const liters = waterGrams / 1000;
+            const quarts = liters * 1.05669;
+            waterOutput.textContent = `${quarts.toFixed(1)} Quarts (${liters.toFixed(1)} L)`;
+        }
+
+        // Render Sugar
+        if (hasSugar) {
+            const sugarGrams = saltGrams * 0.5;
+            sugarOutput.textContent = `${sugarGrams.toFixed(1)} g`;
+        }
+
+        // Render Time
+        let timeStr = "";
+        if (isDry) {
+            let hoursMin = Math.round(weightLbs * 1);
+            let hoursMax = Math.round(weightLbs * 2);
+            
+            if (protein === 'turkey' || protein === 'chicken') {
+                if (hoursMax > 24) hoursMax = 24;
+            }
+            if (hoursMin === hoursMax) {
+                timeStr = `${hoursMin} hours (or overnight)`;
+            } else {
+                timeStr = `${hoursMin} - ${hoursMax} hours (or overnight)`;
+            }
+        } else {
+            let hours = Math.round(weightLbs * 1);
+            if (protein === 'turkey' || protein === 'chicken') {
+                if (hours > 24) hours = 24;
+            }
+            timeStr = `${hours} hour${hours !== 1 ? 's' : ''}`;
+        }
+        timeOutput.textContent = timeStr;
+
+        // Render Notes
+        let notes = "Warning: Do not brine meat that is labeled as 'enhanced', 'basted', or 'pre-seasoned' (like most frozen turkeys), as it will be incredibly salty.<br><br>";
+        if (isDry) {
+            notes += "<strong>Method:</strong> Pat meat completely dry before applying salt. Rest uncovered on a wire rack in the fridge.";
+        } else {
+            notes += "<strong>Method:</strong> Always rinse the meat and pat completely dry after removing from a wet brine.";
+        }
+        notesOutput.innerHTML = notes;
+    }
+
+    calculateBtn.addEventListener("click", calculate);
+
+    copyBtn.addEventListener("click", () => {
+        let text = `Brine Recipe (${proteinType.options[proteinType.selectedIndex].text}, ${meatWeight.value} ${isKgToggle.checked ? 'kg' : 'lbs'}):\n`;
+        text += `Salt: ${saltVolumeOutput.textContent} (${saltWeightOutput.textContent}) of ${saltType.options[saltType.selectedIndex].text}\n`;
+        
+        if (!isDryBrineToggle.checked) {
+            text += `Water: ${waterOutput.textContent}\n`;
+        }
+        
+        if (includeSugar.checked) {
+            text += `Sugar: ${sugarOutput.textContent}\n`;
+        }
+        
+        text += `Time: ${timeOutput.textContent}\n`;
+        text += `Notes: ${notesOutput.innerText}`;
+
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = "Copied!";
+            setTimeout(() => copyBtn.textContent = originalText, 2000);
+        });
+    });
+
+    // Init
+    updateUI();
+});
