@@ -163,6 +163,14 @@ select.form-input option {
             <span class="input-label">Meat Weight</span>
             <input type="number" id="meat-weight" class="form-input" value="10" step="0.1" min="0.1">
           </div>
+          
+          <div id="turkey-helper-container" style="display: none; flex-direction: row; align-items: flex-start; gap: 8px; margin-top: -8px; padding-left: 4px;">
+            <input type="checkbox" id="turkey-helper-toggle" style="margin-top: 2px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <label for="turkey-helper-toggle" style="font-family: var(--font-ui); font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text-soft);">Is this a whole turkey?</label>
+              <div id="turkey-helper-note" style="display: none; font-size: 11px; color: var(--warn);">Chef's Tip: Subtract 1.5 lbs from your package weight to account for the neck and giblets before entering the weight above.</div>
+            </div>
+          </div>
 
           <div class="input-group">
             <span class="input-label">Salt Type</span>
@@ -173,6 +181,7 @@ select.form-input option {
               <option value="sea">Fine Sea Salt</option>
             </select>
           </div>
+          <div id="salt-warning-node" style="font-size: 11px; color: var(--warn); display: none; margin-top: -8px; padding-left: 4px;"></div>
           
           <div class="input-group">
             <span class="input-label">Brine Strength</span>
@@ -237,6 +246,14 @@ select.form-input option {
             <button id="copy-btn" class="glass-lite" style="padding: 8px 16px; font-family: var(--font-ui); font-size: 12px; color: var(--text); border: 1px solid var(--hairline-2); border-radius: 6px; cursor: pointer; background: var(--glass-bg-2);">
                 Copy to Clipboard
             </button>
+       </div>
+       
+       <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--hairline-2); text-align: center;">
+           <h4 style="font-family: var(--font-ui); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-soft); margin: 0 0 12px;">Next Steps for Your Cook:</h4>
+           <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+               <a href="../meat-thawing-planner.html" style="color: var(--accent); text-decoration: none;">Need to thaw it first? Use the Meat Thawing Planner</a>
+               <a href="../perfect-roast-pull-temp-calculator.html" style="color: var(--accent); text-decoration: none;">Ready to cook? Find your exact target pull temperature with the Perfect Roast Pull Temp Calculator</a>
+           </div>
        </div>
     </div>
 

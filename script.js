@@ -29,6 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeOutput = document.getElementById("time-output");
     const notesOutput = document.getElementById("notes-output");
     
+    const turkeyHelperContainer = document.getElementById("turkey-helper-container");
+    const turkeyHelperToggle = document.getElementById("turkey-helper-toggle");
+    const turkeyHelperNote = document.getElementById("turkey-helper-note");
+    const saltWarningNode = document.getElementById("salt-warning-node");
+    
     const calculateBtn = document.getElementById("calculate-btn");
     const copyBtn = document.getElementById("copy-btn");
 
@@ -44,10 +49,33 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             sugarSection.style.display = "none";
         }
+        
+        if (proteinType.value === "turkey") {
+            turkeyHelperContainer.style.display = "flex";
+        } else {
+            turkeyHelperContainer.style.display = "none";
+            turkeyHelperToggle.checked = false;
+        }
+        
+        if (turkeyHelperToggle.checked) {
+            turkeyHelperNote.style.display = "block";
+        } else {
+            turkeyHelperNote.style.display = "none";
+        }
+        
+        if (saltType.value === "table" || saltType.value === "morton") {
+            saltWarningNode.style.display = "block";
+            saltWarningNode.textContent = "Note: Table salt and Morton Kosher are significantly denser than Diamond Crystal Kosher. Ensure your brand matches your selection exactly to avoid a massive salt bomb!";
+        } else {
+            saltWarningNode.style.display = "none";
+        }
     }
 
     isDryBrineToggle.addEventListener("change", updateUI);
     includeSugar.addEventListener("change", updateUI);
+    proteinType.addEventListener("change", updateUI);
+    turkeyHelperToggle.addEventListener("change", updateUI);
+    saltType.addEventListener("change", updateUI);
 
     function formatTbsp(totalTbsp) {
         if (totalTbsp >= 16) {
@@ -118,7 +146,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!isDry) {
             const liters = waterGrams / 1000;
             const quarts = liters * 1.05669;
-            waterOutput.textContent = `${quarts.toFixed(1)} Quarts (${liters.toFixed(1)} L)`;
+            waterOutput.innerHTML = `
+                <div style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">${quarts.toFixed(1)} Quarts (${liters.toFixed(1)} L)</div>
+                <div style="font-size: 13px; color: var(--text-soft); font-weight: 400; line-height: 1.4; text-align: left; font-family: var(--font-ui);">
+                    <strong style="color: var(--text);">Step 1:</strong> Bring 25% of the total water volume to a boil to completely dissolve the salt and sugar.<br><br>
+                    <strong style="color: var(--text);">Step 2:</strong> Add the remaining 75% of the volume as Ice and Cold Water to safely chill the brine to fridge temperature before adding the meat.
+                </div>
+            `;
         }
 
         // Render Sugar
