@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const meatWeightLabel = document.getElementById("meat-weight-label");
     const saltType = document.getElementById("salt-type");
     const brineStrength = document.getElementById("brine-strength");
+    const briningMethodContainer = document.getElementById("brining-method-container");
+    const briningMethod = document.getElementById("brining-method");
     const includeSugar = document.getElementById("include-sugar");
 
     // Outputs
@@ -38,12 +40,22 @@ document.addEventListener("DOMContentLoaded", () => {
     
     const calculateBtn = document.getElementById("calculate-btn");
     const copyBtn = document.getElementById("copy-btn");
+    
+    // Timer state
+    let maxHoursForTimer = 0;
+    const startTimerBtn = document.getElementById("start-timer-btn");
+    const stopTimerBtn = document.getElementById("stop-timer-btn");
+    const timerContainer = document.getElementById("timer-container");
+    const liveTimerDisplay = document.getElementById("live-timer-display");
+    let timerInterval = null;
 
     function updateUI() {
         if (isDryBrineToggle.checked) {
             waterSection.style.display = "none";
+            briningMethodContainer.style.display = "none";
         } else {
             waterSection.style.display = "block";
+            briningMethodContainer.style.display = "flex";
         }
         
         if (includeSugar.checked) {
@@ -86,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     proteinType.addEventListener("change", updateUI);
     turkeyHelperToggle.addEventListener("change", updateUI);
     saltType.addEventListener("change", updateUI);
+    briningMethod.addEventListener("change", updateUI);
 
     function formatTbsp(totalTbsp) {
         if (totalTbsp >= 16) {
@@ -119,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let saltGrams = 0;
         let waterGrams = 0;
+        const isEQ = briningMethod.value === 'eq';
 
         if (isDry) {
             // Dry Brine Math
@@ -132,12 +146,17 @@ document.addEventListener("DOMContentLoaded", () => {
             // Water volume is 50% of meat weight to submerge
             waterGrams = weightGrams * 0.5;
             
-            // Equilibrium target in water (5% standard)
-            let wetRatio = 0.05;
-            if (strength === 'light') wetRatio = 0.04;
-            if (strength === 'strong') wetRatio = 0.06;
-            
-            saltGrams = waterGrams * wetRatio;
+            if (isEQ) {
+                const totalWeight = weightGrams + waterGrams;
+                saltGrams = totalWeight * 0.015;
+            } else {
+                // Equilibrium target in water (5% standard)
+                let wetRatio = 0.05;
+                if (strength === 'light') wetRatio = 0.04;
+                if (strength === 'strong') wetRatio = 0.06;
+                
+                saltGrams = waterGrams * wetRatio;
+            }
         }
 
         // Salt Density Conversions
@@ -195,9 +214,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Render Time
         let timeStr = "";
+        let hoursMax = 0;
+        
         if (isDry) {
             let hoursMin = Math.round(weightLbs * 1);
-            let hoursMax = Math.round(weightLbs * 2);
+            hoursMax = Math.round(weightLbs * 2);
             
             if (protein === 'turkey' || protein === 'chicken') {
                 if (hoursMax > 24) hoursMax = 24;
@@ -208,22 +229,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 timeStr = `${hoursMin} - ${hoursMax} hours (or overnight)`;
             }
         } else {
-            let hours = Math.round(weightLbs * 1);
+            hoursMax = Math.round(weightLbs * 1);
             if (protein === 'turkey' || protein === 'chicken') {
-                if (hours > 24) hours = 24;
+                if (hoursMax > 24) hoursMax = 24;
             }
-            timeStr = `${hours} hour${hours !== 1 ? 's' : ''}`;
+            timeStr = `${hoursMax} hour${hoursMax !== 1 ? 's' : ''}`;
         }
         timeOutput.textContent = timeStr;
+        maxHoursForTimer = hoursMax;
 
         // Render Notes
         let notes = "Warning: Do not brine meat that is labeled as 'enhanced', 'basted', or 'pre-seasoned' (like most frozen turkeys), as it will be incredibly salty.<br><br>";
         if (isDry) {
             notes += "<strong>Method:</strong> Pat meat completely dry before applying salt. Rest uncovered on a wire rack in the fridge.";
         } else {
-            notes += "<strong>Method:</strong> Always rinse the meat and pat completely dry after removing from a wet brine.";
+            if (isEQ) {
+                notes = "<strong>Equilibrium Mode Active:</strong> The meat will absorb exactly 1.5% salt and cannot become over-salted, even if left in the brine for multiple days. Ideal for long-term curing and ultra-precise BBQ control.<br><br>";
+            } else {
+                notes += "<strong>Method:</strong> Always rinse the meat and pat completely dry after removing from a wet brine.";
+            }
         }
         notesOutput.innerHTML = notes;
+        
+        // Smart URL Forwarding
+        const thawingPlannerLink = document.getElementById("thawing-planner-link");
+        if (thawingPlannerLink) {
+            thawingPlannerLink.href = `../meat-thawing-planner.html?weight=${weight}&protein=${protein}`;
+        }
     }
 
     calculateBtn.addEventListener("click", calculate);
@@ -249,6 +281,62 @@ document.addEventListener("DOMContentLoaded", () => {
             setTimeout(() => copyBtn.textContent = originalText, 2000);
         });
     });
+    
+    // Timer Functions
+    function formatTime(ms) {
+        if (ms <= 0) return "00:00:00";
+        const totalSecs = Math.floor(ms / 1000);
+        const hours = Math.floor(totalSecs / 3600);
+        const mins = Math.floor((totalSecs % 3600) / 60);
+        const secs = totalSecs % 60;
+        return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function updateTimer() {
+        const endTime = parseInt(localStorage.getItem('brineTimerEnd'));
+        if (!endTime || isNaN(endTime)) {
+            timerContainer.style.display = 'none';
+            if (timerInterval) clearInterval(timerInterval);
+            return;
+        }
+        
+        timerContainer.style.display = 'block';
+        const now = Date.now();
+        const remaining = endTime - now;
+        
+        if (remaining <= 0) {
+            liveTimerDisplay.textContent = "00:00:00";
+            liveTimerDisplay.style.color = "var(--warn)";
+            clearInterval(timerInterval);
+            alert("Brining time is up! Please remove your meat from the brine immediately to prevent over-salting.");
+        } else {
+            liveTimerDisplay.textContent = formatTime(remaining);
+            liveTimerDisplay.style.color = "var(--accent)";
+        }
+    }
+
+    startTimerBtn.addEventListener("click", () => {
+        if (maxHoursForTimer > 0) {
+            const endTime = Date.now() + (maxHoursForTimer * 3600 * 1000);
+            localStorage.setItem('brineTimerEnd', endTime.toString());
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+        } else {
+            alert("Please calculate a brine first to set the timer duration.");
+        }
+    });
+
+    stopTimerBtn.addEventListener("click", () => {
+        localStorage.removeItem('brineTimerEnd');
+        if (timerInterval) clearInterval(timerInterval);
+        timerContainer.style.display = 'none';
+    });
+
+    if (localStorage.getItem('brineTimerEnd')) {
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+    }
 
     // Init
     updateUI();
