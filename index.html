@@ -143,6 +143,15 @@ select.form-input option {
             </label>
             <span class="unit-label">Kilograms (kg)</span>
         </div>
+        
+        <div class="unit-toggle-container glass-lite" style="padding: 12px 24px; border-radius: 99px;">
+            <span class="unit-label">Imperial</span>
+            <label class="switch">
+                <input type="checkbox" id="volume-unit-toggle">
+                <span class="slider round"></span>
+            </label>
+            <span class="unit-label">Metric</span>
+        </div>
     </div>
 
     <div class="glass type-card" style="margin-bottom: 24px;">
@@ -160,7 +169,7 @@ select.form-input option {
           </div>
 
           <div class="input-group">
-            <span class="input-label">Meat Weight</span>
+            <span class="input-label" id="meat-weight-label">Meat Weight</span>
             <input type="number" id="meat-weight" class="form-input" value="10" step="0.1" min="0.1">
           </div>
           

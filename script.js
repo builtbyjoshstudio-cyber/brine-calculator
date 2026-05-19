@@ -13,8 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Inputs
     const isDryBrineToggle = document.getElementById("brine-type-toggle");
     const isKgToggle = document.getElementById("unit-toggle");
+    const volumeUnitToggle = document.getElementById("volume-unit-toggle");
     const proteinType = document.getElementById("protein-type");
     const meatWeight = document.getElementById("meat-weight");
+    const meatWeightLabel = document.getElementById("meat-weight-label");
     const saltType = document.getElementById("salt-type");
     const brineStrength = document.getElementById("brine-strength");
     const includeSugar = document.getElementById("include-sugar");
@@ -69,9 +71,17 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             saltWarningNode.style.display = "none";
         }
+        
+        // Update labels based on unit toggle
+        if (isKgToggle.checked) {
+            meatWeightLabel.textContent = "Meat Weight (kg)";
+        } else {
+            meatWeightLabel.textContent = "Meat Weight (lbs)";
+        }
     }
 
     isDryBrineToggle.addEventListener("change", updateUI);
+    isKgToggle.addEventListener("change", updateUI);
     includeSugar.addEventListener("change", updateUI);
     proteinType.addEventListener("change", updateUI);
     turkeyHelperToggle.addEventListener("change", updateUI);
@@ -97,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const isDry = isDryBrineToggle.checked;
         const isKg = isKgToggle.checked;
+        const isMetricLiquid = volumeUnitToggle.checked;
         const protein = proteinType.value;
         const salt = saltType.value;
         const strength = brineStrength.value;
@@ -139,20 +150,41 @@ document.addEventListener("DOMContentLoaded", () => {
         const tbspNeeded = saltGrams / gramsPerTbsp;
 
         // Render Salt
-        saltVolumeOutput.textContent = formatTbsp(tbspNeeded);
-        saltWeightOutput.textContent = `${saltGrams.toFixed(1)} g`;
+        if (isMetricLiquid) {
+            saltVolumeOutput.textContent = `${saltGrams.toFixed(1)} g`;
+            const mlNeeded = tbspNeeded * 15;
+            saltWeightOutput.textContent = mlNeeded >= 100 ? `${mlNeeded.toFixed(0)} ml` : `${mlNeeded.toFixed(1)} ml`;
+        } else {
+            saltVolumeOutput.textContent = formatTbsp(tbspNeeded);
+            saltWeightOutput.textContent = `${saltGrams.toFixed(1)} g`;
+        }
 
         // Render Water
         if (!isDry) {
             const liters = waterGrams / 1000;
             const quarts = liters * 1.05669;
-            waterOutput.innerHTML = `
-                <div style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">${quarts.toFixed(1)} Quarts (${liters.toFixed(1)} L)</div>
-                <div style="font-size: 13px; color: var(--text-soft); font-weight: 400; line-height: 1.4; text-align: left; font-family: var(--font-ui);">
-                    <strong style="color: var(--text);">Step 1:</strong> Bring 25% of the total water volume to a boil to completely dissolve the salt and sugar.<br><br>
-                    <strong style="color: var(--text);">Step 2:</strong> Add the remaining 75% of the volume as Ice and Cold Water to safely chill the brine to fridge temperature before adding the meat.
-                </div>
-            `;
+            
+            if (isMetricLiquid) {
+                const totalVol = liters < 1 ? `${(liters * 1000).toFixed(0)} ml` : `${liters.toFixed(2)} L`;
+                const step1Vol = (liters * 0.25) < 1 ? `${((liters * 0.25) * 1000).toFixed(0)} ml` : `${(liters * 0.25).toFixed(2)} L`;
+                const step2Vol = (liters * 0.75) < 1 ? `${((liters * 0.75) * 1000).toFixed(0)} ml` : `${(liters * 0.75).toFixed(2)} L`;
+                
+                waterOutput.innerHTML = `
+                    <div style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">${totalVol} Total</div>
+                    <div style="font-size: 13px; color: var(--text-soft); font-weight: 400; line-height: 1.4; text-align: left; font-family: var(--font-ui);">
+                        <strong style="color: var(--text);">Step 1:</strong> Bring ${step1Vol} of water to a boil to completely dissolve the salt and sugar.<br><br>
+                        <strong style="color: var(--text);">Step 2:</strong> Add ${step2Vol} of ice/cold water to safely chill the brine to fridge temperature before adding the meat.
+                    </div>
+                `;
+            } else {
+                waterOutput.innerHTML = `
+                    <div style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">${quarts.toFixed(1)} Quarts (${liters.toFixed(1)} L)</div>
+                    <div style="font-size: 13px; color: var(--text-soft); font-weight: 400; line-height: 1.4; text-align: left; font-family: var(--font-ui);">
+                        <strong style="color: var(--text);">Step 1:</strong> Bring 25% of the total water volume to a boil to completely dissolve the salt and sugar.<br><br>
+                        <strong style="color: var(--text);">Step 2:</strong> Add the remaining 75% of the volume as Ice and Cold Water to safely chill the brine to fridge temperature before adding the meat.
+                    </div>
+                `;
+            }
         }
 
         // Render Sugar
