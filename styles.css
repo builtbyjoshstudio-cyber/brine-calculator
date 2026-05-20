@@ -311,13 +311,23 @@ body {
 }
 .anatomy-stage {
   position: relative;
-  aspect-ratio: 16/10;
+  aspect-ratio: auto !important;
   border-radius: 14px;
   background:
     radial-gradient(circle at 25% 30%, var(--wash-1), transparent 55%),
     radial-gradient(circle at 75% 70%, var(--wash-2), transparent 55%),
     var(--bg);
-  overflow: hidden;
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  padding-bottom: 3rem !important;
+}
+.anatomy-stage > * {
+  height: auto !important;
+  max-height: none !important;
 }
 .anatomy-card {
   position: absolute; inset: 22% 14% 18% 14%;
