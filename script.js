@@ -1,3 +1,22 @@
+const TYNKR_REGISTRY = {
+    scaler: "https://builtbyjoshstudio-cyber.github.io/recipe-scaler/",
+    reverseRoast: "https://builtbyjoshstudio-cyber.github.io/reverse-roasting-timeline/",
+    panSwap: "https://builtbyjoshstudio-cyber.github.io/pan-swap-calculator/",
+    roastPull: "https://builtbyjoshstudio-cyber.github.io/perfect-roast-pull-temp-calculator/",
+    brine: "https://builtbyjoshstudio-cyber.github.io/brine-calculator/",
+    thawing: "https://builtbyjoshstudio.com/tools/", // Temporary fallback to Hub until built
+    hub: "https://builtbyjoshstudio.com/tools/"
+};
+
+function getToolUrl(toolId, params = {}) {
+    let baseUrl = TYNKR_REGISTRY[toolId] || TYNKR_REGISTRY['hub'];
+    if (Object.keys(params).length > 0) {
+        const queryString = new URLSearchParams(params).toString();
+        baseUrl += `?${queryString}`;
+    }
+    return baseUrl;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // Theme logic
     const themeBtns = document.querySelectorAll(".theme-switch button");
@@ -251,10 +270,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         notesOutput.innerHTML = notes;
         
-        // Smart URL Forwarding
-        const thawingPlannerLink = document.getElementById("thawing-planner-link");
-        if (thawingPlannerLink) {
-            thawingPlannerLink.href = `../meat-thawing-planner.html?weight=${weight}&protein=${protein}`;
+        // Centralized Routing Updates
+        const pipelineLinkThawing = document.getElementById("pipeline-link-thawing");
+        const pipelineLinkRoast = document.getElementById("pipeline-link-roast");
+        
+        const currentWeight = weight;
+        const currentUnit = isKg ? "kg" : "lbs";
+        const currentProtein = protein;
+        
+        if (pipelineLinkThawing) {
+            pipelineLinkThawing.href = getToolUrl('thawing', { weight: currentWeight, unit: currentUnit, protein: currentProtein });
+        }
+        if (pipelineLinkRoast) {
+            pipelineLinkRoast.href = getToolUrl('roastPull', { weight: currentWeight, unit: currentUnit, protein: currentProtein });
         }
     }
 
