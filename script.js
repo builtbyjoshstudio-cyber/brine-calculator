@@ -77,9 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
             turkeyHelperNote.style.display = "none";
         }
         
-        if (saltType.value === "table" || saltType.value === "morton") {
+        if (saltType.value === "table" || saltType.value === "dense") {
             saltWarningNode.style.display = "block";
-            saltWarningNode.textContent = "Note: Table salt and Morton Kosher are significantly denser than Diamond Crystal Kosher. Ensure your brand matches your selection exactly to avoid a massive salt bomb!";
+            saltWarningNode.textContent = "Note: Table salt and dense granular kosher salt are significantly heavier by volume than coarse flaky kosher salt. Make sure you select the correct texture to avoid a massive salt bomb!";
         } else {
             saltWarningNode.style.display = "none";
         }
@@ -161,8 +161,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Salt Density Conversions
         let gramsPerTbsp = 15; // default
-        if (salt === 'diamond') gramsPerTbsp = 8.44; // 135g/cup
-        else if (salt === 'morton') gramsPerTbsp = 15.6; // 250g/cup
+        if (salt === 'coarse') gramsPerTbsp = 8.44; // 135g/cup (approx coarse flaky)
+        else if (salt === 'dense') gramsPerTbsp = 15.6; // 250g/cup (approx dense granular)
         else if (salt === 'table') gramsPerTbsp = 18.1; // 290g/cup
         else if (salt === 'sea') gramsPerTbsp = 15.6; // 250g/cup
 
