@@ -1,10 +1,10 @@
 const TYNKR_REGISTRY = {
-    scaler: "https://builtbyjoshstudio-cyber.github.io/recipe-scaler/",
-    reverseRoast: "https://builtbyjoshstudio-cyber.github.io/reverse-roasting-timeline/",
+    scaler: "https://builtbyjoshstudio-cyber.github.io/universal-recipe-scaler/",
+    reverseRoast: "https://builtbyjoshstudio-cyber.github.io/reverse-roasting-calculator/",
     panSwap: "https://builtbyjoshstudio-cyber.github.io/pan-swap-calculator/",
     roastPull: "https://builtbyjoshstudio-cyber.github.io/perfect-roast-pull-temp-calculator/",
     brine: "https://builtbyjoshstudio-cyber.github.io/brine-calculator/",
-    thawing: "https://builtbyjoshstudio.com/tools/", // Temporary fallback to Hub until built
+    thawing: "https://builtbyjoshstudio-cyber.github.io/meat-thawing-planner/",
     hub: "https://builtbyjoshstudio.com/tools/"
 };
 
