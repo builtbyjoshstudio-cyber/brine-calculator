@@ -315,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let hoursMin = Math.round(weightLbs * 1);
             hoursMax = Math.round(weightLbs * 2);
             
-            if (protein === 'turkey' || protein === 'chicken') {
+            if (protein === 'turkey' || protein === 'chicken' || protein === 'duck-goose') {
                 if (hoursMax > 24) hoursMax = 24;
             }
             if (hoursMin === hoursMax) {
@@ -325,7 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } else {
             hoursMax = Math.round(weightLbs * 1);
-            if (protein === 'turkey' || protein === 'chicken') {
+            if (protein === 'turkey' || protein === 'chicken' || protein === 'duck-goose') {
                 if (hoursMax > 24) hoursMax = 24;
             }
             timeStr = `${hoursMax} hour${hoursMax !== 1 ? 's' : ''}`;
@@ -430,6 +430,41 @@ document.addEventListener("DOMContentLoaded", () => {
         updateTimer();
     }
 
+    // Ingestion of URL Parameters
+    function parseUrlParameters() {
+        const params = new URLSearchParams(window.location.search);
+        const weight = params.get('weight');
+        const unit = params.get('unit');
+        const protein = params.get('protein');
+
+        if (unit && (unit.toLowerCase() === 'kg' || unit.toLowerCase() === 'metric')) {
+            setWeightUnit('kg');
+        } else if (unit && (unit.toLowerCase() === 'lbs' || unit.toLowerCase() === 'imperial')) {
+            setWeightUnit('lbs');
+        }
+
+        if (protein) {
+            const select = document.getElementById("protein-type");
+            const lowerProtein = protein.toLowerCase();
+            for (let option of select.options) {
+                if (option.value.toLowerCase() === lowerProtein || option.text.toLowerCase().includes(lowerProtein)) {
+                    select.value = option.value;
+                    break;
+                }
+            }
+        }
+
+        if (weight) {
+            meatWeight.value = parseFloat(weight) || 10;
+        }
+
+        updateUI();
+
+        if (protein || weight) {
+            calculate();
+        }
+    }
+
     // Init
-    updateUI();
+    parseUrlParameters();
 });

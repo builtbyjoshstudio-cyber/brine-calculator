@@ -149,11 +149,26 @@ select.form-input option {
        <div style="display: flex; flex-direction: column; gap: 16px;">
           <div class="input-group">
             <span class="input-label">Protein Type</span>
-            <select id="protein-type" class="form-input">
-              <option value="turkey">Turkey</option>
-              <option value="chicken">Chicken</option>
-              <option value="pork">Pork</option>
-              <option value="beef">Beef / Steak</option>
+            <select id="protein-type" name="proteinType" class="form-input">
+              <optgroup label="Poultry">
+                <option value="turkey">Turkey (Whole or Breast)</option>
+                <option value="chicken">Chicken (Whole or Pieces)</option>
+                <option value="duck-goose">Duck & Goose</option>
+              </optgroup>
+              <optgroup label="Beef">
+                <option value="beef-roast">Beef Roasts (Prime Rib/Tri-Tip)</option>
+                <option value="beef-brisket">Beef Brisket (Low & Slow)</option>
+                <option value="beef-steak">Steaks & Chops (Individual)</option>
+              </optgroup>
+              <optgroup label="Pork & Lamb">
+                <option value="pork-shoulder">Pork Shoulder & Hams</option>
+                <option value="lamb">Lamb Leg or Rack</option>
+              </optgroup>
+              <optgroup label="Ground, Game & Seafood">
+                <option value="ground-meat">Ground Meats (Beef/Pork/Turkey)</option>
+                <option value="game-meat">Venison & Bison (Lean Game)</option>
+                <option value="seafood">Fish & Seafood</option>
+              </optgroup>
             </select>
           </div>
 
