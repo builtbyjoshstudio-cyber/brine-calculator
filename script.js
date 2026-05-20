@@ -68,6 +68,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const liveTimerDisplay = document.getElementById("live-timer-display");
     let timerInterval = null;
 
+    function updatePipelineLinks() {
+        const pipelineLinkThawing = document.getElementById("pipeline-link-thawing");
+        const pipelineLinkRoast = document.getElementById("pipeline-link-roast");
+        
+        const currentWeight = parseFloat(meatWeight.value) || 0;
+        const currentUnit = isKgToggle.checked ? "kg" : "lbs";
+        const currentProtein = proteinType.value;
+        
+        if (pipelineLinkThawing) {
+            pipelineLinkThawing.href = getToolUrl('thawing', { weight: currentWeight, unit: currentUnit, protein: currentProtein });
+        }
+        if (pipelineLinkRoast) {
+            pipelineLinkRoast.href = getToolUrl('roastPull', { weight: currentWeight, unit: currentUnit, protein: currentProtein });
+        }
+    }
+
     function updateUI() {
         if (isDryBrineToggle.checked) {
             waterSection.style.display = "none";
@@ -109,6 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             meatWeightLabel.textContent = "Meat Weight (lbs)";
         }
+
+        updatePipelineLinks();
     }
 
     isDryBrineToggle.addEventListener("change", updateUI);
@@ -118,6 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
     turkeyHelperToggle.addEventListener("change", updateUI);
     saltType.addEventListener("change", updateUI);
     briningMethod.addEventListener("change", updateUI);
+    meatWeight.addEventListener("input", updateUI);
 
     function formatTbsp(totalTbsp) {
         if (totalTbsp >= 16) {
@@ -271,19 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
         notesOutput.innerHTML = notes;
         
         // Centralized Routing Updates
-        const pipelineLinkThawing = document.getElementById("pipeline-link-thawing");
-        const pipelineLinkRoast = document.getElementById("pipeline-link-roast");
-        
-        const currentWeight = weight;
-        const currentUnit = isKg ? "kg" : "lbs";
-        const currentProtein = protein;
-        
-        if (pipelineLinkThawing) {
-            pipelineLinkThawing.href = getToolUrl('thawing', { weight: currentWeight, unit: currentUnit, protein: currentProtein });
-        }
-        if (pipelineLinkRoast) {
-            pipelineLinkRoast.href = getToolUrl('roastPull', { weight: currentWeight, unit: currentUnit, protein: currentProtein });
-        }
+        updatePipelineLinks();
     }
 
     calculateBtn.addEventListener("click", calculate);
