@@ -126,32 +126,20 @@ select.form-input option {
       </div>
     </header>
 
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 24px; gap: 16px;">
-        <div class="unit-toggle-container glass-lite" style="padding: 12px 24px; border-radius: 99px;">
-            <span class="unit-label">Wet Brine</span>
-            <label class="switch">
-                <input type="checkbox" id="brine-type-toggle">
-                <span class="slider round"></span>
-            </label>
-            <span class="unit-label">Dry Brine</span>
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;">
+        <div class="tynkr-unit-toggle-wrapper">
+            <button type="button" id="brine-type-wet" class="tynkr-unit-btn active">Wet Brine</button>
+            <button type="button" id="brine-type-dry" class="tynkr-unit-btn">Dry Brine</button>
         </div>
         
-        <div class="unit-toggle-container glass-lite" style="padding: 12px 24px; border-radius: 99px;">
-            <span class="unit-label">Pounds (lbs)</span>
-            <label class="switch">
-                <input type="checkbox" id="unit-toggle">
-                <span class="slider round"></span>
-            </label>
-            <span class="unit-label">Kilograms (kg)</span>
+        <div class="tynkr-unit-toggle-wrapper">
+            <button type="button" id="unit-imperial" class="tynkr-unit-btn active">Pounds (lbs)</button>
+            <button type="button" id="unit-metric" class="tynkr-unit-btn">Kilograms (kg)</button>
         </div>
         
-        <div class="unit-toggle-container glass-lite" style="padding: 12px 24px; border-radius: 99px;">
-            <span class="unit-label">Imperial</span>
-            <label class="switch">
-                <input type="checkbox" id="volume-unit-toggle">
-                <span class="slider round"></span>
-            </label>
-            <span class="unit-label">Metric</span>
+        <div class="tynkr-unit-toggle-wrapper">
+            <button type="button" id="volume-unit-imperial" class="tynkr-unit-btn active">Imperial</button>
+            <button type="button" id="volume-unit-metric" class="tynkr-unit-btn">Metric</button>
         </div>
     </div>
 

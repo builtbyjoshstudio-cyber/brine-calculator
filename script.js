@@ -30,9 +30,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Inputs
-    const isDryBrineToggle = document.getElementById("brine-type-toggle");
-    const isKgToggle = document.getElementById("unit-toggle");
-    const volumeUnitToggle = document.getElementById("volume-unit-toggle");
+    const brineTypeWetBtn = document.getElementById("brine-type-wet");
+    const brineTypeDryBtn = document.getElementById("brine-type-dry");
+    const unitImperialBtn = document.getElementById("unit-imperial");
+    const unitMetricBtn = document.getElementById("unit-metric");
+    const volumeUnitImperialBtn = document.getElementById("volume-unit-imperial");
+    const volumeUnitMetricBtn = document.getElementById("volume-unit-metric");
+
+    let currentBrineType = 'wet';
+    let currentWeightUnit = 'lbs';
+    let currentVolumeUnit = 'imperial';
+
+    const isDryBrineToggle = {
+      get checked() { return currentBrineType === 'dry'; }
+    };
+    const isKgToggle = {
+      get checked() { return currentWeightUnit === 'kg'; }
+    };
+    const volumeUnitToggle = {
+      get checked() { return currentVolumeUnit === 'metric'; }
+    };
     const proteinType = document.getElementById("protein-type");
     const meatWeight = document.getElementById("meat-weight");
     const meatWeightLabel = document.getElementById("meat-weight-label");
@@ -129,8 +146,48 @@ document.addEventListener("DOMContentLoaded", () => {
         updatePipelineLinks();
     }
 
-    isDryBrineToggle.addEventListener("change", updateUI);
-    isKgToggle.addEventListener("change", updateUI);
+    function setBrineType(type) {
+        currentBrineType = type;
+        if (type === 'dry') {
+            brineTypeDryBtn.classList.add('active');
+            brineTypeWetBtn.classList.remove('active');
+        } else {
+            brineTypeWetBtn.classList.add('active');
+            brineTypeDryBtn.classList.remove('active');
+        }
+        updateUI();
+    }
+
+    function setWeightUnit(unit) {
+        currentWeightUnit = unit;
+        if (unit === 'kg') {
+            unitMetricBtn.classList.add('active');
+            unitImperialBtn.classList.remove('active');
+        } else {
+            unitImperialBtn.classList.add('active');
+            unitMetricBtn.classList.remove('active');
+        }
+        updateUI();
+    }
+
+    function setVolumeUnit(unit) {
+        currentVolumeUnit = unit;
+        if (unit === 'metric') {
+            volumeUnitMetricBtn.classList.add('active');
+            volumeUnitImperialBtn.classList.remove('active');
+        } else {
+            volumeUnitImperialBtn.classList.add('active');
+            volumeUnitMetricBtn.classList.remove('active');
+        }
+        updateUI();
+    }
+
+    if (brineTypeWetBtn) brineTypeWetBtn.addEventListener('click', () => setBrineType('wet'));
+    if (brineTypeDryBtn) brineTypeDryBtn.addEventListener('click', () => setBrineType('dry'));
+    if (unitImperialBtn) unitImperialBtn.addEventListener('click', () => setWeightUnit('lbs'));
+    if (unitMetricBtn) unitMetricBtn.addEventListener('click', () => setWeightUnit('kg'));
+    if (volumeUnitImperialBtn) volumeUnitImperialBtn.addEventListener('click', () => setVolumeUnit('imperial'));
+    if (volumeUnitMetricBtn) volumeUnitMetricBtn.addEventListener('click', () => setVolumeUnit('metric'));
     includeSugar.addEventListener("change", updateUI);
     proteinType.addEventListener("change", updateUI);
     turkeyHelperToggle.addEventListener("change", updateUI);
